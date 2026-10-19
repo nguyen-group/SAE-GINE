@@ -63,7 +63,7 @@ def gnnopt_weighted_mean(
 
 
 def run_gnnopt_style_direct_alpha_test(
-    project_root=r"D:\TB3",
+    project_root=r"./",
     npz_file=None,
     output_dir=None,
     expected_test_n=992,

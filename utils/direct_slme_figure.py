@@ -21,20 +21,20 @@ CSV for reproducibility but is not drawn. Each run creates a new folder.
     RESULT_DIR = PROJECT_ROOT / 'processed' / 'paired_training' / 'paper_outputs' / 'FINAL_direct_alpha_SLME_500nm'
     CSV_PATH = Path(input_csv) if input_csv is not None else RESULT_DIR / 'FINAL_direct_alpha_SLME_test_samples.csv'
     if not CSV_PATH.is_file():
-        raise FileNotFoundError(f'Không tìm thấy bảng dữ liệu:\n{CSV_PATH}')
+        raise FileNotFoundError(f'Not found:\n{CSV_PATH}')
     df_all = pd.read_csv(CSV_PATH)
     required_columns = ['sample_id', 'reference_SLME_percent', 'predicted_SLME_percent', 'thickness_nm']
     missing = [column for column in required_columns if column not in df_all]
     if missing:
-        raise KeyError(f'Thiếu các cột: {missing}')
+        raise KeyError(f'Missing columns: {missing}')
     if len(df_all) != 992:
-        raise ValueError(f'Bảng held-out dự kiến có 992 dòng, hiện có {len(df_all)}.')
+        raise ValueError(f'Expected 992 rows in held-out table, found {len(df_all)}.')
     if df_all['sample_id'].isna().any():
-        raise ValueError('Có sample_id bị thiếu.')
+        raise ValueError('Not all sample_id values are filled.')
     if df_all['sample_id'].duplicated().any():
-        raise ValueError('Có sample_id bị trùng.')
+        raise ValueError('There are duplicate sample_id values.')
     if not np.allclose(df_all['thickness_nm'].to_numpy(dtype=float), 500.0):
-        raise ValueError('Dữ liệu không đồng nhất ở độ dày 500 nm.')
+        raise ValueError('Data is not consistent at 500 nm thickness.')
     slme_columns = ['reference_SLME_percent', 'predicted_SLME_percent']
     all_values = df_all[slme_columns].to_numpy(dtype=float)
     valid_mask = np.isfinite(all_values).all(axis=1)
@@ -44,18 +44,18 @@ CSV for reproducibility but is not drawn. Each run creates a new folder.
     n_valid = len(plot_df)
     n_excluded = len(excluded_df)
     if n_valid < 100:
-        raise ValueError('Không đủ 100 cặp SLME hữu hạn để đánh giá Top-100.')
+        raise ValueError('Not enough finite SLME pairs to evaluate Top-100.')
     reference = plot_df['reference_SLME_percent'].to_numpy(dtype=float)
     prediction = plot_df['predicted_SLME_percent'].to_numpy(dtype=float)
     if min(reference.min(), prediction.min()) < 0 or max(reference.max(), prediction.max()) > 35:
-        raise ValueError('Có SLME ngoài khoảng 0–35%. Cần mở rộng trục trước khi vẽ.')
+        raise ValueError('An SLME value is outside the range 0-35%. Please extend the axes before plotting.')
     error = prediction - reference
     mae = float(np.mean(np.abs(error)))
     rmse = float(np.sqrt(np.mean(error ** 2)))
     ss_res = float(np.sum(error ** 2))
     ss_tot = float(np.sum((reference - reference.mean()) ** 2))
     if ss_tot <= 0:
-        raise ValueError('Không thể tính R² vì SLME tham chiếu không có phương sai.')
+        raise ValueError('Cannot calculate R² because the reference SLME has zero variance.')
     r2 = 1.0 - ss_res / ss_tot
     top_k = np.array([10, 20, 50, 100], dtype=int)
     reference_order = np.argsort(-reference, kind='mergesort')
@@ -97,16 +97,16 @@ CSV for reproducibility but is not drawn. Each run creates a new folder.
         if show:
             plt.show()
         plt.close(fig)
-    print(f'Nguồn: {CSV_PATH}')
-    print(f'Tổng số mẫu held-out: {n_total}')
-    print(f'Cặp SLME hữu hạn dùng cho hình và metrics: {n_valid}')
-    print(f'Mẫu không đưa vào hình và metrics: {n_excluded}')
+    print(f'Source: {CSV_PATH}')
+    print(f'Total number of held-out samples: {n_total}')
+    print(f'Finite SLME pairs used for the plot and metrics: {n_valid}')
+    print(f'Samples not included in the plot and metrics: {n_excluded}')
     print(f'R² = {r2:.6f}')
     print(f'MAE = {mae:.6f} pp | RMSE = {rmse:.6f} pp')
     print('\nTop-k overlap:')
     print(topk_df.to_string(index=False))
-    print('\nHình đã lưu:')
+    print('\nFiles saved:')
     for extension, path in output_paths.items():
         print(f'{extension.upper()}: {path}')
-    print('Hình parity duy nhất, khổ 90 x 90 mm; ưu tiên PDF vector.')
+    print('Notes: Single parity plot, size 90 x 90 mm; PDF vector preferred.')
     return {'metrics': metrics_df, 'topk': topk_df, 'samples': plot_df, 'excluded': excluded_df, 'paths': output_paths, 'output_dir': OUTPUT_DIR}

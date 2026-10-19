@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import binomtest
 
-def run_paired_slme_bootstrap(project_root='D:\\TB3', *, input_csv=None, output_dir=None, n_boot=20000, seed=2025, batch_size=250, top_k=(10, 20, 50, 100), show=True):
+def run_paired_slme_bootstrap(project_root='./', *, input_csv=None, output_dir=None, n_boot=20000, seed=2025, batch_size=250, top_k=(10, 20, 50, 100), show=True):
     """Compare frozen held-out Route 1/2 SLME on the CSV common_valid cohort.
 
 Defaults preserve the original cell: 20,000 paired draws, seed 2025,

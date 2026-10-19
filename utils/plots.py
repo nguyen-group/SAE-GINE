@@ -475,7 +475,7 @@ def export_gated_contribution_weights(
 
 
 def plot_linear_ensemble_ssl_gain_dotplot_final(
-    root=r"D:\\TB3\\processed\\paired_training",
+    root=r"./processed/paired_training",
     contrib_subdir="linear_ensemble_contribution_20_24",
     gain_filename="linear_ensemble_20_24_ssl_gain_vs_scratch.csv",
     save_prefix="fig_linear_ensemble_ssl_gain_dotplot_final_no_note",

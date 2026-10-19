@@ -6,7 +6,7 @@ import pandas as pd
 from scipy.special import lambertw
 from scipy.stats import pearsonr, spearmanr
 
-def run_fair_slme_comparison(project_root='D:\\TB3', *, audit_npz=None, reference_csv=None, output_dir=None, verbose=True):
+def run_fair_slme_comparison(project_root='./', *, audit_npz=None, reference_csv=None, output_dir=None, verbose=True):
     """Recompute held-out SLME for both frozen alpha routes and save comparisons.
 
 Preserves the original optical-gap cutoffs, Lambert-W solver, finite-cohort
@@ -23,7 +23,7 @@ Default output filenames overwrite previous comparison tables as before.
     try:
         from pvlib import spectrum
     except ImportError as exc:
-        raise ImportError('Thiếu pvlib. Cài một lần bằng:\npip install pvlib') from exc
+        raise ImportError('Missing pvlib. Install once with:\npip install pvlib') from exc
     ROOT = Path(project_root) / 'processed/paired_training'
     AUDIT_NPZ = Path(audit_npz) if audit_npz is not None else ROOT / 'paper_outputs/final_alpha_route_audit/FINAL_alpha_route_comparison_arrays.npz'
     CURRENT_SLME_CSV = Path(reference_csv) if reference_csv is not None else ROOT / 'paper_outputs/FINAL_direct_alpha_SLME_500nm/FINAL_direct_alpha_SLME_test_samples.csv'
@@ -44,12 +44,12 @@ Default output filenames overwrite previous comparison tables as before.
     HC_EV_NM = 1239.8419843320025
     for p in [AUDIT_NPZ, CURRENT_SLME_CSV, DIRECT_SEED42]:
         if not p.is_file():
-            raise FileNotFoundError(f'Không tìm thấy:\n{p}')
+            raise FileNotFoundError(f'File not found:\n{p}')
     audit = np.load(AUDIT_NPZ, allow_pickle=True)
     required_audit_keys = ['energy_eV', 'alpha_true_cm1', 'alpha_derived_SAE_eps1_eps2_cm1', 'alpha_direct_SAE_cm1']
     missing = [k for k in required_audit_keys if k not in audit.files]
     if missing:
-        raise KeyError(f'AUDIT NPZ thiếu keys: {missing}\nAvailable: {audit.files}')
+        raise KeyError(f'AUDIT NPZ missing keys: {missing}\nAvailable: {audit.files}')
     E = np.asarray(audit['energy_eV'], dtype=np.float64).reshape(-1)
     ALPHA_DERIVED = np.asarray(audit['alpha_derived_SAE_eps1_eps2_cm1'], dtype=np.float64)
     ALPHA_DIRECT = np.asarray(audit['alpha_direct_SAE_cm1'], dtype=np.float64)
@@ -59,7 +59,7 @@ Default output filenames overwrite previous comparison tables as before.
         raise RuntimeError(f'Expected (992, 2001), got {ALPHA_DERIVED.shape}')
     z_direct = np.load(DIRECT_SEED42, allow_pickle=True)
     if 'base_idx' not in z_direct.files:
-        raise KeyError('Direct prediction NPZ không có base_idx.')
+        raise KeyError('Direct prediction NPZ no base_idx.')
     BASE_IDX = np.asarray(z_direct['base_idx']).reshape(-1)
     if len(BASE_IDX) != 992:
         raise RuntimeError(f'Expected 992 base_idx, got {len(BASE_IDX)}')
@@ -69,16 +69,16 @@ Default output filenames overwrite previous comparison tables as before.
     required_csv = ['base_idx', 'optical_gap_cutoff_eV', 'reference_SLME_percent', 'predicted_SLME_percent']
     missing = [c for c in required_csv if c not in old_df.columns]
     if missing:
-        raise KeyError(f'Current SLME CSV thiếu columns: {missing}')
+        raise KeyError(f'Current SLME CSV missing columns: {missing}')
     if len(old_df) != 992:
         raise RuntimeError(f'Expected 992 rows in current SLME CSV, got {len(old_df)}')
     if old_df['base_idx'].duplicated().any():
         raise RuntimeError('Duplicate base_idx trong current SLME CSV.')
     meta = old_df.set_index('base_idx').reindex(BASE_IDX)
     if meta.index.isna().any():
-        raise RuntimeError('Không align được base_idx.')
+        raise RuntimeError('Can not align base_idx.')
     if meta['optical_gap_cutoff_eV'].isna().any():
-        raise RuntimeError('Có optical_gap_cutoff_eV bị thiếu.')
+        raise RuntimeError('There are missing optical_gap_cutoff_eV values.')
     GAP_EV = meta['optical_gap_cutoff_eV'].to_numpy(dtype=np.float64)
     OLD_REF_SLME = meta['reference_SLME_percent'].to_numpy(dtype=np.float64)
     OLD_DIRECT_SLME = meta['predicted_SLME_percent'].to_numpy(dtype=np.float64)
@@ -129,7 +129,7 @@ Default output filenames overwrite previous comparison tables as before.
     am15 = spectrum.get_reference_spectra()
     global_column = next((column for column in am15.columns if 'global' in str(column).lower()), None)
     if global_column is None:
-        raise RuntimeError('Không tìm thấy Global AM1.5G column.')
+        raise RuntimeError('File not found: Global AM1.5G column.')
     wavelength_nm = np.asarray(am15.index, dtype=np.float64)
     irradiance_w_m2_nm = np.asarray(am15[global_column], dtype=np.float64)
     solar_mask = np.isfinite(wavelength_nm) & np.isfinite(irradiance_w_m2_nm) & (wavelength_nm >= SOLAR_LAMBDA_MIN_NM) & (wavelength_nm <= SOLAR_LAMBDA_MAX_NM) & (irradiance_w_m2_nm >= 0.0)
@@ -152,7 +152,7 @@ Default output filenames overwrite previous comparison tables as before.
     print('=' * 110)
     print(f'Psolar = {P_SOLAR:.6f} W/m^2')
     if not 900.0 <= P_SOLAR <= 1050.0:
-        raise RuntimeError('Psolar không hợp lý.')
+        raise RuntimeError('Psolar not making sense.')
 
     def blackbody_photon_radiance(energy_eV, temperature_K):
         energy_eV = np.asarray(energy_eV, dtype=np.float64)

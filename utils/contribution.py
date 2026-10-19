@@ -18,7 +18,7 @@ from pymatgen.core.periodic_table import Element
 from torch_geometric.nn import GINEConv, global_mean_pool
 
 from .features import *
-import utils_tb.features as _features_module
+import utils.features as _features_module
 
 #contribution analysis utilities
 # Enhanced graph 20/24 with covalent_radius_cordero
@@ -759,7 +759,7 @@ def export_linear_ensemble_contribution_weights(
     epsR_df=None,
     epsI_ds=None,
     epsR_ds=None,
-    root=r"D:\\TB3\\processed\\paired_training",
+    root=r"./processed/paired_training",
     device=None,
     model_class=None,
     hidden_dim=192,
@@ -1089,6 +1089,46 @@ def patch_enhanced_graph_builder_to_20_24(verbose=True):
 # Added to replace the earlier slide-style figure with header/text.
 # ============================================================
 
+def _tb3_pretty_linear_node_label(feature):
+    """Format node descriptor names for display without changing their weights."""
+    name = str(feature)
+    labels = {
+        "atomic_number": "Atomic number",
+        "row": "Period",
+        "group": "Group",
+        "atomic_mass": "Atomic mass",
+        "electronegativity": "Electronegativity",
+        "atomic_radius": "Atomic radius",
+        "atomic_radius_calculated": "Calculated atomic radius",
+        "average_ionic_radius": "Average ionic radius",
+        "covalent_radius_cordero": "Covalent radius (Cordero)",
+        "ionization_energy": "Ionization energy",
+        "is_metal": "Metal indicator",
+        "is_transition_metal": "Transition-metal indicator",
+    }
+    labels.update({f"val_{orbital}": f"Valence {orbital} electrons" for orbital in "spdf"})
+    labels.update({f"block_{orbital}": f"{orbital}-block indicator" for orbital in "spdf"})
+    return labels.get(name, name.replace("_", " "))
+
+
+def _tb3_pretty_linear_edge_label(feature):
+    """Format edge descriptor names, retaining each radial-basis index."""
+    name = str(feature)
+    if name.startswith("distance_rbf_"):
+        return "Distance RBF " + name.removeprefix("distance_rbf_")
+    labels = {
+        "abs_delta_X": "Electronegativity difference",
+        "abs_delta_radius": "Atomic radius difference",
+        "radius_sum": "Atomic radius sum",
+        "abs_delta_ionization": "Ionization energy difference",
+        "abs_delta_Z": "Atomic number difference",
+        "same_element": "Same element",
+        "same_group": "Same group",
+        "same_row": "Same period",
+    }
+    return labels.get(name, name.replace("_", " "))
+
+
 def plot_linear_ensemble_contribution_slidefig(
     node_meanstd,
     edge_meanstd,
@@ -1275,7 +1315,7 @@ def export_linear_ensemble_contribution_weights_cleanfig(
     epsR_df=None,
     epsI_ds=None,
     epsR_ds=None,
-    root=r"D:\\TB3\\processed\\paired_training",
+    root=r"./processed/paired_training",
     device=None,
     model_class=None,
     hidden_dim=192,

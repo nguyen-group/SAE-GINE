@@ -9,7 +9,7 @@ import zipfile
 import numpy as np
 import pandas as pd
 
-def package_remaining_db1_dft(project_root='D:\\TB3', *, dft_root='D:\\DFT_TEST', output_dir=None, show=True, verbose=True):
+def package_remaining_db1_dft(project_root='./', *, dft_root='./DFT_data', output_dir=None, show=True, verbose=True):
     """Audit available spectra and package remaining final DB1 Top-50 structures.
 
 Run after notebook Cell 16A. Preserves its manifest/rank matching and original

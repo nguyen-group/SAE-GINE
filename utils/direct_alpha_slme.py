@@ -767,7 +767,7 @@ def _topk_overlap(
 
 
 def run_final_direct_alpha_slme_validation(
-    project_root=r"D:\TB3",
+    project_root=r"./",
     direct_alpha_dir=None,
     data_zip=None,
     output_dir=None,
@@ -1146,7 +1146,7 @@ def run_final_direct_alpha_slme_validation(
         f"{np.max(alpha_predicted_cm1):.3e} cm^-1",
     )
 
-    import utils_tb.data as DATA
+    import utils.data as DATA
 
     DATA = importlib.reload(
         DATA

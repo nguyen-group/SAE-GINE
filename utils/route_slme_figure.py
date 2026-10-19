@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def plot_route_slme_comparison(project_root='D:\\TB3', *, input_csv=None, output_dir=None, show=True):
+def plot_route_slme_comparison(project_root='./', *, input_csv=None, output_dir=None, show=True):
     """Plot held-out Route 1/2 from the existing common-valid SLME CSV.
 
 Preserves the original filtering, statistics, figure design and filenames.

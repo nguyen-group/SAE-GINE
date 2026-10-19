@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def plot_heldout_route1_slme(project_root='D:\\TB3', *, result_dir=None, output_dir=None, show=True, verbose=True):
+def plot_heldout_route1_slme(project_root='./', *, result_dir=None, output_dir=None, show=True, verbose=True):
     """Render the existing Route-1 held-out SLME parity figure and export metrics.
 
 Preserves the original CSV selection, common_valid mask, ID checks, stable
