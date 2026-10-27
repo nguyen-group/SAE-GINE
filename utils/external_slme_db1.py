@@ -452,7 +452,7 @@ def _calculate_slme_batch(
 
 
 def run_final_db1_slme_screening(
-    project_root=r"D:\TB3",
+    project_root=r"./",
     pool_csv=None,
     structure_cache=None,
     direct_alpha_dir=None,
@@ -598,7 +598,7 @@ def run_final_db1_slme_screening(
         0.05,
     )
 
-    import utils_tb.external_screening as EXT
+    import utils.external_screening as EXT
 
     EXT = importlib.reload(
         EXT
