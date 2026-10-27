@@ -30,16 +30,13 @@ GNNOpt
 └── build_zintl_like_pool_no_element_filter_DISCOVERY_READY_DB2_FIXED.ipynb: High-throughput screen the Zintl-like and AB2C2 materials with SAE-GINE
 ```
 # How to run
-Step 1: Download the GNNOpt package:
+Step 1: Download the SAE-GINE package:
 
-    git clone https://github.com/nguyen-group/GNNOpt.git
+    git clone https://github.com/nguyen-group/SAE-GINE.git
 
-Step 2: Go to the source code in the GNNOpt directory to run the program:
+Step 2: Go to the source code in the SAE-GINE directory to run the program:
 
-    cd GNNOpt
-    jupyter-lab gnnopt-***.ipynb
-(***: is the optical spectra that you want to run; for example, `jupyter-lab gnnopt-alpha.ipynb` for the absorption coefficient)
+    cd SAE-GINE
+    jupyter-lab sae-gine.ipynb
 
-Note: In `gnnopt-***.ipynb` files, we used the trained model in the folder `GNNOpt/model` to save time. If you want to train the model on your computer, please uncomment at line:
-
-`# train(model, opt, dataloader_train, dataloader_valid, loss_fn, loss_fn_mae, run_name, max_iter=100, scheduler=scheduler, device=device)`
+Note: This program is time-consuming on an RTX 4090 (takes several days). Therefore, it should be run on a GPU workstation.
